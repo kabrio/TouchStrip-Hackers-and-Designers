@@ -97,6 +97,7 @@ void loop() {
       firstContact = false;
     }
   } else if (val < 100) {
+    Serial.println("LETTING GO");
     firstContact = false;
     letGo = true;
   }

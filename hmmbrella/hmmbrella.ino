@@ -11,7 +11,7 @@
 
 //we define constants for the number of strips, the number of leds per strip and the total number of leds
 #define NUM_STRIPS 1
-#define NUM_LEDS_STRIP 30
+#define NUM_LEDS_STRIP 40
 #define NUM_LEDS NUM_LEDS_STRIP * NUM_STRIPS
 
 //we define an array that will carry all the colour values for our leds
@@ -46,7 +46,7 @@ void setup() {
   Serial.begin(9600);
 
   //we make sure that the library knows where all our strips and leds are on the arduino
-  FastLED.addLeds<NEOPIXEL, 10>(leds, 0, NUM_LEDS_STRIP);
+  FastLED.addLeds<NEOPIXEL, 6>(leds, 0, NUM_LEDS_STRIP);
   //  FastLED.addLeds<NEOPIXEL, 7>(leds, NUM_LEDS_STRIP, NUM_LEDS_STRIP);
   //  FastLED.addLeds<NEOPIXEL, 8>(leds, 2 * NUM_LEDS_STRIP, NUM_LEDS_STRIP);
   //  FastLED.addLeds<NEOPIXEL, 9>(leds, 3 * NUM_LEDS_STRIP, NUM_LEDS_STRIP);
@@ -63,7 +63,7 @@ void loop() {
   //the main loop
   //we first clear any previous frame in the leds array
 
-  long start = millis();
+  //  long start = millis();
   long val =  cs_4_2.capacitiveSensor(30);
 
   //  Serial.print(millis() - start);        // check on performance in milliseconds
@@ -80,31 +80,28 @@ void loop() {
       letGo = false;
       Serial.println("FIRST CONTACT");
       rHue = random(255);
-      br = 0;
+      //      br = 0;
     }
-  } else if (val < 100) {
+
+    // FADE IN
+    if (br < 255) br += fadeInAmt;
+    for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i].setHSV(rHue, 100, br);
+    }
+    FastLED.show();
+
+  } else if (val < 300) {
+    Serial.println("LETTING GO");
     firstContact = false;
     letGo = true;
-  }
 
-  while (val > 300) { // FADE IN
-    if (br < 255) br += fadeInAmt;
-      for (int i = 0; i < NUM_LEDS; i++) {
-        leds[i].setHSV(rHue, S, br);
-      }
-  }
-  while (val < 200) { // FADE OUT
+    // FADE OUT
     if (br > 255) br -= fadeOutAmt;
-      for (int i = 0; i < NUM_LEDS; i++) {
-        leds[i].setHSV(rHue, S, br);
-      }
+    for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i].setHSV(rHue, 100, br);
+    }
+    FastLED.show();
   }
-  //  clearLeds();
-
-  showLeds();
-
-
-  FastLED.show();
 
   //the delay makes sure the current "frame" is visible for a specified amount of time
   delay(20);
