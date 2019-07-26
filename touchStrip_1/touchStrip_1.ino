@@ -104,7 +104,7 @@ void loop() {
   //  clearLeds();
 
   showLeds();
-  fadeLeds(1);
+  fadeLeds(-1);
 
   FastLED.show();
 
@@ -133,13 +133,13 @@ void showLeds() {
   }
 }
 
-void fadeLeds(int fadeAmount) {
+void fadeLeds(float fadeAmount) {
   for (int i = 0; i < NUM_LEDS; i++) {
-    int r, g, b;
+    float r, g, b;
     r = leds[i].red; g = leds[i].green; b = leds[i].blue;
-    r = max(r - fadeAmount, 0);
-    g = max(g - fadeAmount, 0);
-    b = max(b - fadeAmount, 0);
+    r = constrain(r + fadeAmount, 0, 255);
+    g = constrain(g + fadeAmount, 0, 255);
+    b = constrain(b + fadeAmount, 0, 255);
     //    Serial.println(r);
     leds[i].setRGB(r, g, b);
   }

@@ -32,7 +32,7 @@ float smoothVal = 0;
 CapacitiveSensor   cs_4_2 = CapacitiveSensor(4, 2);       // 10M resistor between pins 4 & 2, pin 2 is sensor pin, add a wire and or foil if desired
 int touchIndex = 0;
 long touchStart;
-int minDuration = 3333;
+int minDuration = 200;
 bool firstContact = false;
 bool letGo = true;
 int br = 0;
@@ -129,13 +129,13 @@ void showLeds() {
   }
 }
 
-void fadeLeds(int fadeAmount) {
+void fadeLeds(float fadeAmount) {
   for (int i = 0; i < NUM_LEDS; i++) {
-    int r, g, b;
+    float r, g, b;
     r = leds[i].red; g = leds[i].green; b = leds[i].blue;
-    r = max(r - fadeAmount, 0);
-    g = max(g - fadeAmount, 0);
-    b = max(b - fadeAmount, 0);
+    r = constrain(r + fadeAmount, 0, 255);
+    g = constrain(g + fadeAmount, 0, 255);
+    b = constrain(b + fadeAmount, 0, 255);
     //    Serial.println(r);
     leds[i].setRGB(r, g, b);
   }
