@@ -4,11 +4,7 @@
 
 
 // TO DO 
-// Add at random place
-// Fade present LEDs while adding new touch 
-// Improve 
-// Flicker present stars
-// Build
+// Add ToDo list
 
 //we import the library we will use for controlling our leds
 #include <FastLED.h>
