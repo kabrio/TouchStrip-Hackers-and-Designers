@@ -1,9 +1,9 @@
-// Project made for Hackers and Designers 2019 
-// Wearables workshop with Eric 
+// Project made for Hackers and Designers 2019
+// Wearables workshop with Eric
 // Dasha Ilina, Chuck Kuan & Jonas Bo
 
 
-// TO DO 
+// TO DO
 // Add ToDo list
 
 //we import the library we will use for controlling our leds
@@ -37,6 +37,7 @@ bool firstContact = false;
 bool letGo = true;
 int br = 0;
 int rHue;
+float fadeInAmt = 10, fadeOutAmt = 10;
 
 
 
@@ -65,15 +66,14 @@ void loop() {
   long start = millis();
   long val =  cs_4_2.capacitiveSensor(30);
 
-//  Serial.print(millis() - start);        // check on performance in milliseconds
-//  Serial.print("\t");                    // tab character for debug windown spacing
-//
+  //  Serial.print(millis() - start);        // check on performance in milliseconds
+  //  Serial.print("\t");                    // tab character for debug windown spacing
+  //
   Serial.print(val);                     // print sensor output 1
   Serial.print("\t");
- Serial.println(smooth(val));            // print smoothed value
+  Serial.println(smooth(val));            // print smoothed value
 
-
-  if (val > 300) {
+  if (val > 300) { // set random color for each new touch
     if (firstContact == false && letGo == true) {
       touchStart = millis();
       firstContact = true;
@@ -82,30 +82,32 @@ void loop() {
       rHue = random(255);
       br = 0;
     }
-    Serial.println("TOUCHING");
-    br = min(br + 10, 255);
-    leds[touchIndex].setHSV(rHue, 255, br);
-    if (millis() - touchStart > minDuration) {
-      Serial.println("ADD TOUCH");
-      addTouch(touchIndex);
-      touchIndex = touchIndex + 1;
-      if (touchIndex > NUM_LEDS) touchIndex = 0;
-      firstContact = false;
-    }
   } else if (val < 100) {
     firstContact = false;
     letGo = true;
   }
 
+  while (val > 300) { // FADE IN
+    if (br < 255) br += fadeInAmt;
+      for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i].setHSV(rHue, S, br);
+      }
+  }
+  while (val < 200) { // FADE OUT
+    if (br > 255) br -= fadeOutAmt;
+      for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i].setHSV(rHue, S, br);
+      }
+  }
   //  clearLeds();
 
   showLeds();
-  fadeLeds(1);
+
 
   FastLED.show();
 
   //the delay makes sure the current "frame" is visible for a specified amount of time
-  delay(100);
+  delay(20);
 }
 
 void addTouch(int i) {
