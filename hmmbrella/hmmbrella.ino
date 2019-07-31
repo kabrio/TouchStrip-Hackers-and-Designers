@@ -92,7 +92,7 @@ void loop() {
     FastLED.show();
 
   } else if (val < 300) {
-    Serial.println("LETTING GO");
+    if (firstContact == true) Serial.println("LETTING GO");
     firstContact = false;
     letGo = true;
 
