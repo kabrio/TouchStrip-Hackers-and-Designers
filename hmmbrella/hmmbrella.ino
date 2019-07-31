@@ -1,5 +1,5 @@
 // Project made for Hackers and Designers 2019
-// Wearables workshop with Eric
+// Wearables workshop with Eric Overmeir
 // Dasha Ilina, Chuck Kuan & Jonas Bo
 
 
@@ -69,16 +69,16 @@ void loop() {
   //  Serial.print(millis() - start);        // check on performance in milliseconds
   //  Serial.print("\t");                    // tab character for debug windown spacing
   //
-  Serial.print(val);                     // print sensor output 1
-  Serial.print("\t");
-  Serial.println(smooth(val));            // print smoothed value
+//  Serial.print(val);                     // print sensor output 1
+//  Serial.print("\t");
+//  Serial.println(smooth(val));            // print smoothed value
 
   if (val > 300) { // set random color for each new touch
     if (firstContact == false && letGo == true) {
       touchStart = millis();
       firstContact = true;
       letGo = false;
-      Serial.println("FIRST CONTACT");
+      Serial.println("  FIRST CONTACT");
       rHue = random(255);
       //      br = 0;
     }
@@ -90,8 +90,8 @@ void loop() {
     }
     FastLED.show();
 
-  } else if (val < 300) {
-    Serial.println("LETTING GO");
+  } else if (val < 300  && firstContact == true) {
+    Serial.println("  LETTING GO");
     firstContact = false;
     letGo = true;
 

@@ -1,12 +1,12 @@
-// Project made for Hackers and Designers 2019 
-// Wearables workshop with Eric 
+// Project made for Hackers and Designers 2019
+// Wearables workshop with Eric Overmeir
 // Dasha Ilina, Chuck Kuan & Jonas Bo
 
 
-// TO DO 
+// TO DO
 // Add at random place
-// Fade present LEDs while adding new touch 
-// Improve 
+// Fade present LEDs while adding new touch
+// Improve
 // Flicker present stars
 // Build
 
@@ -20,6 +20,8 @@
 
 //we define an array that will carry all the colour values for our leds
 CRGB leds[NUM_LEDS_STRIP * NUM_STRIPS];
+int hues[NUM_LEDS_STRIP * NUM_STRIPS];
+int brights[NUM_LEDS_STRIP * NUM_STRIPS];
 
 //we create a datatype to store rgb color values in
 struct RGBColor {
@@ -33,14 +35,18 @@ struct RGBColor {
 #define SMOOTH_ALPHA 0.4
 
 float smoothVal = 0;
-CapacitiveSensor   cs_4_2 = CapacitiveSensor(4, 2);       // 10M resistor between pins 4 & 2, pin 2 is sensor pin, add a wire and or foil if desired
-int touchIndex = 0;
+CapacitiveSensor cs_4_2 = CapacitiveSensor(4, 2);       // 10M resistor between pins 4 & 2, pin 2 is sensor pin, add a wire and or foil if desired
+int touchIndex;
+int activeTouches = 0;
 long touchStart;
 int minDuration = 3333;
 bool firstContact = false;
 bool letGo = true;
 int br = 0;
 int rHue;
+int SAT = 255;
+
+float fadeInAmt = 1;
 
 
 
@@ -59,7 +65,9 @@ void setup() {
   FastLED.show();
 
   randomSeed(analogRead(0));
-  //  fillLeds();
+  for (int i = 0; i < NUM_LEDS; i++) { // Set all brightnesses to 0
+    brights[i] = 0;
+  }
 }
 
 void loop() {
@@ -69,12 +77,12 @@ void loop() {
   long start = millis();
   long val =  cs_4_2.capacitiveSensor(30);
 
-//  Serial.print(millis() - start);        // check on performance in milliseconds
-//  Serial.print("\t");                    // tab character for debug windown spacing
-//
-  Serial.print(val);                     // print sensor output 1
-  Serial.print("\t");
- Serial.println(smooth(val));            // print smoothed value
+  //  Serial.print(millis() - start);        // check on performance in milliseconds
+  //  Serial.print("\t");                    // tab character for debug windown spacing
+  //
+  //  Serial.print(val);                     // print sensor output 1
+  //  Serial.print("\t");
+  //  Serial.println(smooth(val));            // print smoothed value
 
 
   if (val > 300) {
@@ -83,20 +91,23 @@ void loop() {
       firstContact = true;
       letGo = false;
       Serial.println("FIRST CONTACT");
+      touchIndex = findSpot();
       rHue = random(255);
-      br = 0;
     }
+
+    // FADING IN
     Serial.println("TOUCHING");
-    br = min(br + 10, 255);
-    leds[touchIndex].setHSV(rHue, 255, br);
+    brights[touchIndex] = min(brights[touchIndex] + fadeInAmt, 255);
+    leds[touchIndex].setHSV(rHue, SAT, brights[touchIndex]);
+
     if (millis() - touchStart > minDuration) {
       Serial.println("ADD TOUCH");
       addTouch(touchIndex);
-      touchIndex = touchIndex + 1;
+      activeTouches = activeTouches + 1;
       if (touchIndex > NUM_LEDS) touchIndex = 0;
       firstContact = false;
     }
-  } else if (val < 100) {
+  } else if (val < 100 && firstContact == true) {
     Serial.println("LETTING GO");
     firstContact = false;
     letGo = true;
@@ -104,17 +115,39 @@ void loop() {
 
   //  clearLeds();
 
-  showLeds();
+  updateLeds();
   fadeLeds(-1);
 
   FastLED.show();
 
   //the delay makes sure the current "frame" is visible for a specified amount of time
-  delay(100);
+  delay(1);
+}
+
+int findSpot() {
+  bool found = false;
+  int randomL;
+  if (activeTouches < NUM_LEDS) {
+    while (!found) {
+      randomL = random(NUM_LEDS);
+      for (int i = 0; i < NUM_LEDS; i++) {
+        if (brights[i] <= 0) {
+          found == true;
+          Serial.print("Found random spot: ");
+          Serial.println(randomL);
+        }
+      }
+    }
+    return randomL;
+  }
+
+
 }
 
 void addTouch(int i) {
-  leds[i].setHSV(random(255), 255, 255);
+  hues[i] = random(255);
+  brights[i] = 255;
+  leds[i].setHSV(hues[i], SAT, brights[i]);
 }
 
 
@@ -125,29 +158,23 @@ void clearLeds() {
   }
 }
 
-//we use clearLeds to clear the screen and put all leds to black, this will enable us to make an animation
-void showLeds() {
+void updateLeds() {
   for (int i = 0; i < NUM_LEDS; i++) {
-    RGBColor c = {0, 0, 0};
-    c.r = leds[i].red; c.g = leds[i].green; c.b = leds[i].blue;
-    leds[i].setRGB(c.r, c.g, c.b);
+    leds[i].setRGB(hues[i], SAT, brights[i]);
   }
 }
 
 void fadeLeds(float fadeAmount) {
   for (int i = 0; i < NUM_LEDS; i++) {
-    float r, g, b;
-    r = leds[i].red; g = leds[i].green; b = leds[i].blue;
-    r = constrain(r + fadeAmount, 0, 255);
-    g = constrain(g + fadeAmount, 0, 255);
-    b = constrain(b + fadeAmount, 0, 255);
-    //    Serial.println(r);
-    leds[i].setRGB(r, g, b);
+    brights[i] = constrain(brights[i] + fadeAmount, 0, 255);
+    //    Serial.println(brights[i]);
+    leds[i].setHSV(hues[i], SAT, brights[i]);
+    if (brights[i] <= 0) activeTouches--;
   }
 }
 
 void fillLeds() {
   for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i].setRGB(round(random(255)), random(255), random(255));
+    leds[i].setHSV(brights[random(255)], SAT, 255);
   }
 }
