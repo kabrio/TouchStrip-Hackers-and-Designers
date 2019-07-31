@@ -35,9 +35,9 @@ long touchStart;
 int minDuration = 200;
 bool firstContact = false;
 bool letGo = true;
-int br = 0;
+float br = 0;
 int rHue;
-float fadeInAmt = 5, fadeOutAmt = 5;
+float fadeInAmt = 5, fadeOutAmt = 0.5;
 
 
 
