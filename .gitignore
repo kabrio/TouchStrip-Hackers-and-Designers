@@ -1,3 +1,5 @@
 
 *.JPG
 *.MOV
+.gitignore
+.DS_Store
