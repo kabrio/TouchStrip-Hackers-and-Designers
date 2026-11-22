@@ -6,11 +6,18 @@ We built it in the wearables workshop with Eric Overmeir at
 
 By Dasha Ilina, Chuck Kuan and Jonas Bo.
 
+## Hmmmbrella
+
+The project is named after its main piece: an umbrella with the LED strip
+mounted inside. When a second person joins the person carrying the umbrella,
+the touch sensor reacts and the inside of the umbrella glows in a warm colour.
+When they leave, the light slowly fades away.
+
 ## Sketches
 
 | Folder | What it does | State |
 | --- | --- | --- |
-| `hmmbrella/` | **Hmmmbrella (L.U.R.E.)**: a 60-LED strip. While you touch the sensor, the whole strip fades in to a random warm hue (orange to yellow). When you let go, it slowly fades out. Each new touch picks a new hue. This is the version we used for the video. | Works |
+| `hmmbrella/` | **Hmmmbrella (L.U.R.E.)**: a 60-LED strip mounted inside an umbrella. The umbrella lights up when a second person joins the one carrying it. While the sensor is touched, the whole strip fades in to a random warm hue (orange to yellow). When you let go, it slowly fades out. Each new touch picks a new hue. This is the version we used for the video. | Works |
 | `touchStrip_1/` | A 30-LED strip. Each touch lights one random dark LED in a random colour, which brightens while you hold it. After 3.3 s it jumps to full brightness and stays, then fades out slowly, so touches add up to a field of fading stars. Let go earlier and the LED fades out from where it was. | Compiles for the Uno, fixed in 2026 (see below), not yet tested on the strip |
 
 Each folder also has `erics.ino`, the helper functions from the workshop
